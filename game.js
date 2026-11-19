@@ -10,8 +10,8 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.15;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x071016);
-scene.fog = new THREE.FogExp2(0x071016, 0.018);
+scene.background = new THREE.Color(0x9cc8d2);
+scene.fog = new THREE.Fog(0x9cc8d2, 45, 105);
 
 const camera = new THREE.PerspectiveCamera(72, innerWidth / innerHeight, 0.05, 180);
 camera.position.set(0, 1.65, 10);
@@ -44,16 +44,16 @@ const ui = {
   hit: document.getElementById("hitMarker")
 };
 
-scene.add(new THREE.HemisphereLight(0xaedfff, 0x1a251f, 1.25));
-const sun = new THREE.DirectionalLight(0xcceeff, 2);
-sun.position.set(-12, 22, 8);
+scene.add(new THREE.HemisphereLight(0xe4f6ff, 0x86785a, 2));
+const sun = new THREE.DirectionalLight(0xffedcc, 2.5);
+sun.position.set(-18, 30, 12);
 sun.castShadow = true;
 sun.shadow.mapSize.set(1024, 1024);
 scene.add(sun);
 
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(70, 70),
-  new THREE.MeshStandardMaterial({ color: 0x182126, roughness: .82, metalness: .18 })
+  new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .9, metalness: 0 })
 );
 floor.rotation.x = -Math.PI / 2;
 floor.receiveShadow = true;
@@ -64,19 +64,16 @@ textureLoader.load("assets/map.jpg", (mapTexture) => {
   mapTexture.colorSpace = THREE.SRGBColorSpace;
   mapTexture.wrapS = THREE.RepeatWrapping;
   mapTexture.wrapT = THREE.RepeatWrapping;
-  mapTexture.repeat.set(12, 12);
+  mapTexture.repeat.set(3.5, 3.5);
   mapTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
   floor.material.map = mapTexture;
   floor.material.color.set(0xffffff);
   floor.material.needsUpdate = true;
 });
 
-const grid = new THREE.GridHelper(70, 35, 0x2ba5b5, 0x1b363b);
-grid.position.y = .012;
-scene.add(grid);
-
-const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x27383d, roughness: .55, metalness: .45 });
-const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x10191c, roughness: .7, metalness: .3 });
+const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x788589, roughness: .8, metalness: .12 });
+const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x34454a, roughness: .65, metalness: .35 });
+const crateMaterial = new THREE.MeshStandardMaterial({ color: 0x987449, roughness: .86 });
 const cyanMaterial = new THREE.MeshBasicMaterial({ color: 0x42daf1 });
 const redMaterial = new THREE.MeshBasicMaterial({ color: 0xff3b50 });
 
@@ -91,62 +88,63 @@ function box(w, h, d, x, y, z, material = wallMaterial) {
 }
 
 const obstacles = [];
-for (let i = -30; i <= 30; i += 10) {
-  box(.7, 5, 70, i, 2.5, 0, i % 20 === 0 ? darkMaterial : wallMaterial);
-  box(70, 5, .7, 0, 2.5, i, i % 20 === 0 ? darkMaterial : wallMaterial);
-}
-box(8, 3.2, 1.2, -15, 1.6, 5);
-box(8, 3.2, 1.2, 15, 1.6, -5);
-box(1.2, 3.2, 9, 5, 1.6, 12);
-box(1.2, 3.2, 9, -5, 1.6, -12);
-box(7, 2.2, 3, 0, 1.1, 0);
+box(70, 2.6, 1.2, 0, 1.3, -34, wallMaterial);
+box(70, 2.6, 1.2, 0, 1.3, 34, wallMaterial);
+box(1.2, 2.6, 70, -34, 1.3, 0, wallMaterial);
+box(1.2, 2.6, 70, 34, 1.3, 0, wallMaterial);
 
-// Arena details
-for (let i = 0; i < 14; i++) {
-  const angle = i / 14 * Math.PI * 2;
-  const radius = 24 + (i % 3) * 3;
-  const post = new THREE.Mesh(new THREE.CylinderGeometry(.12, .15, 4.5, 8), darkMaterial);
-  post.position.set(Math.cos(angle) * radius, 2.25, Math.sin(angle) * radius);
+// Low cover and supply crates keep the coastal yard open and navigable.
+box(7, 2.4, 3, -15, 1.2, -12, darkMaterial);
+box(7, 2.4, 3, 15, 1.2, 12, darkMaterial);
+box(4, 1.25, 1, -8, .625, 3, wallMaterial);
+box(4, 1.25, 1, 8, .625, -3, wallMaterial);
+box(2.2, 1.35, 2.2, -20, .675, 8, crateMaterial);
+box(2.2, 1.35, 2.2, 20, .675, -8, crateMaterial);
+box(2.2, 1.35, 2.2, 9, .675, 19, crateMaterial);
+box(2.2, 1.35, 2.2, -9, .675, -19, crateMaterial);
+
+for (let i = -2; i <= 2; i++) {
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(.08, .1, 1.8, 8), darkMaterial);
+  post.position.set(i * 5, .9, -29);
   post.castShadow = true;
   scene.add(post);
-  const lamp = new THREE.Mesh(new THREE.BoxGeometry(.35, .12, .35), i % 2 ? cyanMaterial : redMaterial);
-  lamp.position.set(post.position.x, 4.45, post.position.z);
+  const lamp = new THREE.Mesh(new THREE.BoxGeometry(.3, .12, .3), i % 2 ? cyanMaterial : redMaterial);
+  lamp.position.set(i * 5, 1.85, -29);
   scene.add(lamp);
 }
 
 const weapon = new THREE.Group();
-const weaponImage = new Image();
-weaponImage.onload = () => {
-  const maskCanvas = document.createElement("canvas");
-  maskCanvas.width = weaponImage.naturalWidth;
-  maskCanvas.height = weaponImage.naturalHeight;
-  const context = maskCanvas.getContext("2d");
-  context.drawImage(weaponImage, 0, 0);
-  const imageData = context.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
-  const pixels = imageData.data;
-  for (let i = 0; i < pixels.length; i += 4) {
-    const r = pixels[i];
-    const g = pixels[i + 1];
-    const b = pixels[i + 2];
-    if (r > 235 && g > 235 && b > 235) pixels[i + 3] = 0;
-  }
-  context.putImageData(imageData, 0, 0);
-  const gunTexture = new THREE.CanvasTexture(maskCanvas);
-  gunTexture.colorSpace = THREE.SRGBColorSpace;
-  const gunImage = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.18, 1.18),
-    new THREE.MeshBasicMaterial({
-      map: gunTexture,
-      transparent: true,
-      depthTest: false,
-      side: THREE.DoubleSide
-    })
-  );
-  gunImage.position.set(.43, -.38, -.85);
-  gunImage.renderOrder = 20;
-  weapon.add(gunImage);
-};
-weaponImage.src = "assets/weapon.jpg";
+const gunMetal = new THREE.MeshStandardMaterial({ color: 0x263238, metalness: .78, roughness: .28 });
+const gunPolymer = new THREE.MeshStandardMaterial({ color: 0x11191c, metalness: .22, roughness: .62 });
+const gunAccent = new THREE.MeshStandardMaterial({ color: 0xd95332, metalness: .3, roughness: .4 });
+function gunPart(geometry, material, x, y, z, rotationX = 0) {
+  const part = new THREE.Mesh(geometry, material);
+  part.position.set(x, y, z);
+  part.rotation.x = rotationX;
+  part.castShadow = true;
+  weapon.add(part);
+  return part;
+}
+
+// The barrel's local -Z axis matches the camera's forward direction.
+gunPart(new THREE.BoxGeometry(.2, .17, .45), gunMetal, .29, -.25, -.37);
+gunPart(new THREE.CylinderGeometry(.045, .06, .48, 12), gunMetal, .29, -.22, -.79, Math.PI / 2);
+gunPart(new THREE.CylinderGeometry(.068, .068, .09, 12), gunAccent, .29, -.22, -1.02, Math.PI / 2);
+gunPart(new THREE.BoxGeometry(.12, .08, .38), gunPolymer, .29, -.12, -.46);
+gunPart(new THREE.BoxGeometry(.16, .29, .19), gunPolymer, .29, -.45, -.31, -.18);
+gunPart(new THREE.BoxGeometry(.13, .33, .22), gunMetal, .29, -.49, -.48, -.12);
+gunPart(new THREE.BoxGeometry(.22, .11, .38), gunPolymer, .29, -.21, .03);
+gunPart(new THREE.BoxGeometry(.16, .12, .13), gunAccent, .29, -.25, -.1);
+const muzzleFlash = new THREE.Mesh(
+  new THREE.ConeGeometry(.12, .34, 8),
+  new THREE.MeshBasicMaterial({ color: 0xffd27a })
+);
+muzzleFlash.rotation.x = Math.PI / 2;
+muzzleFlash.position.set(.29, -.22, -1.19);
+muzzleFlash.visible = false;
+weapon.add(muzzleFlash);
+weapon.scale.setScalar(.68);
+weapon.position.set(.03, -.08, -.2);
 camera.add(weapon);
 scene.add(camera);
 
@@ -206,7 +204,7 @@ function blocked(x, z) {
   for (const o of obstacles) {
     if (x > o.minX - .35 && x < o.maxX + .35 && z > o.minZ - .35 && z < o.maxZ + .35) return true;
   }
-  return x < -34 || x > 34 || z < -34 || z > 34;
+  return   x < -32.8 || x > 32.8 || z < -32.8 || z > 32.8;
 }
 
 function shoot() {
@@ -408,6 +406,7 @@ function animate() {
   const dt = Math.min(clock.getDelta(), .05);
   shootCooldown = Math.max(0, shootCooldown - dt);
   muzzleVisible = Math.max(0, muzzleVisible - dt);
+  muzzleFlash.visible = muzzleVisible > 0;
   weapon.position.y = Math.sin(performance.now() * .004) * .003;
   updatePlayer(dt);
   updateEnemies(dt);
