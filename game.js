@@ -143,8 +143,8 @@ muzzleFlash.rotation.x = Math.PI / 2;
 muzzleFlash.position.set(.29, -.22, -1.19);
 muzzleFlash.visible = false;
 weapon.add(muzzleFlash);
-weapon.scale.setScalar(.68);
-weapon.position.set(.03, -.08, -.2);
+weapon.scale.setScalar(.5);
+weapon.position.set(.03, -.12, -.6);
 camera.add(weapon);
 scene.add(camera);
 
