@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEON STRIKE</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="crosshair"><i></i></div>
+
+  <div id="hud">
+    <div class="hud-panel">
+      <span class="label">生命</span>
+      <div class="health-row"><strong id="health">100</strong><div class="bar"><i id="healthBar"></i></div></div>
+    </div>
+    <div class="hud-panel ammo-panel">
+      <span class="label">VX-9</span>
+      <strong id="ammo">24</strong><span class="reserve">/ <b id="reserve">144</b></span>
+    </div>
+  </div>
+
+  <div id="score">
+    <span>擊殺</span><strong id="kills">0</strong>
+  </div>
+
+  <div id="wave">第 1 波</div>
+  <div id="damageFlash"></div>
+  <div id="hitMarker">×</div>
+
+  <div id="touchControls" aria-label="觸控操作">
+    <div class="touch-dpad">
+      <button class="touch-key up" data-key="KeyW">W</button>
+      <button class="touch-key left" data-key="KeyA">A</button>
+      <button class="touch-key down" data-key="KeyS">S</button>
+      <button class="touch-key right" data-key="KeyD">D</button>
+    </div>
+    <button class="touch-sprint" data-key="ShiftLeft">衝刺</button>
+  </div>
+
+  <div id="menu" class="overlay">
+    <div class="menu-card">
+      <div class="eyebrow">TACTICAL SHOOTER // 03</div>
+      <h1>NEON<br><em>STRIKE</em></h1>
+      <p>進入隔離區，清除所有戰鬥機器人。</p>
+      <button id="startButton">開始任務 <span>›</span></button>
+      <div class="controls">
+        <div><kbd>WASD</kbd><span>移動</span></div>
+        <div><kbd>滑鼠</kbd><span>瞄準 / 射擊</span></div>
+        <div><kbd>R</kbd><span>裝填</span></div>
+        <div><kbd>Shift</kbd><span>衝刺</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="gameOver" class="overlay hidden">
+    <div class="menu-card">
+      <div class="eyebrow">任務失敗</div>
+      <h1>你已<br><em>陣亡</em></h1>
+      <p>擊殺：<strong id="finalKills">0</strong></p>
+      <button id="restartButton">再次挑戰 <span>›</span></button>
+    </div>
+  </div>
+
+  <script type="module" src="game.js"></script>
+</body>
+</html>
